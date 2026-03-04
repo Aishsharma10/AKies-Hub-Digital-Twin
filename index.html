@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AKies Hub — Logistics Dispatch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #050811;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 57, 255, 0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0, 210, 190, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 60% 40%, rgba(255, 90, 170, 0.07) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 24px;
+            padding: 44px 40px 40px;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.55), 0 0 0 0.5px rgba(255, 255, 255, 0.06) inset;
+        }
+
+        /* Top accent bar */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 40px;
+            right: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7c5cfc, #00d2be, transparent);
+            border-radius: 0 0 4px 4px;
+            opacity: 0.8;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7c5cfc, #00d2be);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 4px 16px rgba(124, 92, 252, 0.4);
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-name span {
+            background: linear-gradient(90deg, #a78bfa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .heading {
+            margin-top: 24px;
+            margin-bottom: 4px;
+            font-size: 26px;
+            font-weight: 700;
+            color: #f0f0ff;
+            letter-spacing: -0.6px;
+        }
+
+        .subheading {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.38);
+            margin-bottom: 36px;
+            letter-spacing: 0.2px;
+        }
+
+        .field {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            margin-bottom: 8px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15px;
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 14px 13px 42px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 12px;
+            color: #f0f0ff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        input:focus {
+            border-color: rgba(124, 92, 252, 0.6);
+            background: rgba(124, 92, 252, 0.07);
+            box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+        }
+
+        input:focus+.input-icon,
+        .input-wrap:focus-within .input-icon {
+            opacity: 1;
+        }
+
+        /* Monospace wallet field */
+        #walletAddress {
+            font-family: 'Courier New', monospace;
+            font-size: 12.5px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 28px 0;
+        }
+
+        .deploy-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #7c5cfc 0%, #4f9cf9 60%, #00d2be 100%);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 6px 24px rgba(124, 92, 252, 0.4);
+        }
+
+        .deploy-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+            transition: left 0.5s;
+        }
+
+        .deploy-btn:hover::before {
+            left: 160%;
+        }
+
+        .deploy-btn:hover {
+            opacity: 0.92;
+            box-shadow: 0 10px 32px rgba(124, 92, 252, 0.55);
+            transform: translateY(-1px);
+        }
+
+        .deploy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .deploy-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Status toast */
+        #status {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        #status.success {
+            display: flex;
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: #34d399;
+        }
+
+        #status.error {
+            display: flex;
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            color: #f87171;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .deploy-btn.loading .spinner {
+            display: block;
+        }
+
+        .deploy-btn.loading .btn-label {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <div class="brand">
+            <div class="brand-icon">🚚</div>
+            <div class="brand-name">AKies <span>Hub</span></div>
+        </div>
+
+        <h1 class="heading">Dispatch Order</h1>
+        <p class="subheading">Submit cargo details to deploy a blockchain-tracked shipment</p>
+
+        <form id="dispatchForm" novalidate>
+
+            <div class="field">
+                <label for="cargoName">Cargo Name</label>
+                <div class="input-wrap">
+                    <input type="text" id="cargoName" name="cargoName" placeholder="e.g. Frozen Pharmaceuticals"
+                        required autocomplete="off" />
+                    <span class="input-icon">📦</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="maxTemp">Max Temperature (°C)</label>
+                <div class="input-wrap">
+                    <input type="number" id="maxTemp" name="maxTemp" placeholder="e.g. -18" step="0.1" required
+                        autocomplete="off" />
+                    <span class="input-icon">🌡️</span>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="walletAddress">Receiver Wallet Address</label>
+                <div class="input-wrap">
+                    <input type="text" id="walletAddress" name="walletAddress" placeholder="0x..." required
+                        autocomplete="off" />
+                    <span class="input-icon">🔑</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <button type="submit" class="deploy-btn" id="deployBtn">
+                <div class="btn-inner">
+                    <div class="spinner"></div>
+                    <span class="btn-label">🚀&nbsp; Deploy Shipment</span>
+                </div>
+            </button>
+
+            <div id="status"></div>
+        </form>
+    </div>
+
+    <script>
+        const WEBHOOK = 'https://n8n.vedsan8n52002.xyz/webhook/069d05fc-470f-40b8-af35-72a584ba78ec';
+
+        const form = document.getElementById('dispatchForm');
+        const btn = document.getElementById('deployBtn');
+        const statusEl = document.getElementById('status');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const cargoName = document.getElementById('cargoName').value.trim();
+            const maxTemp = document.getElementById('maxTemp').value.trim();
+            const walletAddress = document.getElementById('walletAddress').value.trim();
+
+            if (!cargoName || maxTemp === '' || !walletAddress) {
+                showStatus('error', '⚠️ Please fill in all fields before deploying.');
+                return;
+            }
+
+            if (isNaN(Number(maxTemp))) {
+                showStatus('error', '⚠️ Max Temperature must be a valid number.');
+                return;
+            }
+
+            const payload = {
+                cargoName,
+                maxTemp: maxTemp,           // kept as string — avoids NaN→null in JSON.stringify
+                receiverWalletAddress: walletAddress,
+                timestamp: new Date().toISOString()
+            };
+
+            btn.disabled = true;
+            btn.classList.add('loading');
+            statusEl.className = '';
+            statusEl.style.display = 'none';
+
+            try {
+                const res = await fetch(WEBHOOK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    showStatus('success', '✅ Shipment deployed successfully!');
+                    form.reset();
+                } else {
+                    showStatus('error', `❌ Server responded with status ${res.status}.`);
+                }
+            } catch (err) {
+                showStatus('error', '❌ Network error — could not reach the dispatch endpoint.');
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        });
+
+        function showStatus(type, msg) {
+            statusEl.className = type;
+            statusEl.textContent = msg;
+        }
+    </script>
+</body>
+
+</html>
